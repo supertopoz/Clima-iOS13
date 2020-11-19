@@ -20,10 +20,23 @@ struct WeatherManager {
         if let url = URL(string: urlString) {
             let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
                 guard let data = data else { return }
-                print(String(data: data, encoding: .utf8)!)
+                self.parseJSON(weatherData: data)
             }
-
             task.resume()
         }
     }
+    
+    func parseJSON(weatherData: Data) {
+      //  print(String(data: data, encoding: .utf8)!)
+        let decoder = JSONDecoder()
+        do {
+            let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
+            print(decodedData.weather[0].description)
+        } catch {
+            print(error)
+        }
+        
+
+    }
+    
 }
