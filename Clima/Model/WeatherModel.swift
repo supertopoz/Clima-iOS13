@@ -32,7 +32,7 @@ struct WeatherModel {
                 case 801...804:
                     return "cloud.bolt"
                 default:
-                    return "cloud"
+                    return "sun.max"
                 }
     }
 }
