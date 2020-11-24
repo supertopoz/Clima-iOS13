@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 class WeatherViewController: UIViewController {
     
@@ -16,16 +17,30 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var searchTextField: UITextField!
     
     var weatherManager = WeatherManager()
+    let locationManager = CLLocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       searchTextField.delegate = self
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        self.requestLocation()
+        
+        searchTextField.delegate = self
         weatherManager.delegate = self
+        
         // Do any additional setup after loading the view.
         
     }
 
+    func requestLocation() {
+        print("Location Requested")
+        locationManager.requestLocation()
+    }
+    @IBAction func locationPressed(_ sender: UIButton) {
+        
+        requestLocation()
+    }
     
 
 }
@@ -45,6 +60,8 @@ extension WeatherViewController: UITextFieldDelegate {
         searchTextField.endEditing(true)
         return true
     }
+    
+    
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         if textField.text != "" {
@@ -82,5 +99,24 @@ extension WeatherViewController: WeatherMangerDelegate {
     
     func didFailWithError(error: Error) {
         print(error.localizedDescription)
+    }
+}
+
+//MARK: - LocationManagerDelegate
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            locationManager.stopUpdatingLocation()
+            let lat = location.coordinate.latitude
+            let lon = location.coordinate.longitude
+            self.weatherManager.fetchweather(lat, lon)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error.localizedDescription)
+        
     }
 }
